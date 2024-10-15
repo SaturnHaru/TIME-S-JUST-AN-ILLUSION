@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunas de sombras</title>
+    <style>
+        body {
+            font-family: 'Garamond', serif;
+            background-image: url('https://images.unsplash.com/photo-1711350987526-06d69fdfbf64?q=80&w=2664&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            color: #d9c99e;
+            text-align: center;
+            margin-top: 50px;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+        .moldura {
+            display: inline-block;
+            padding: 20px;
+            border: 5px solid #8b4513;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        .decoracao {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 5px solid #d9c99e;
+            border-radius: 20px;
+            background-image: url('https://cdn.pixabay.com/photo/2014/06/16/23/39/black-370118_1280.png');
+            background-size: cover;
+            z-index: -1;
+        }
+        .ampulheta {
+            width: 120px;
+            height: 240px;
+            position: relative;
+            background: url('https://media1.giphy.com/media/xfXqd2vysimRRYCb5u/giphy.webp?cid=790b76116k77j15mwpj08qqw16m1dm58efbgc02q8lz0dfwn&ep=v1_gifs_search&rid=giphy.webp&ct=g') no-repeat center center;
+            background-size: cover;
+            overflow: hidden;
+            margin: 0 auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        .areia {
+            background-color: #f7c600;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            height: 0;
+            transition: height 1s linear;
+        }
+        .rachaduras {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/TLfQvlK.png') no-repeat center center;
+            background-size: cover;
+            opacity: 0;
+            transition: opacity 1s linear;
+        }
+        #timer {
+            font-size: 24px;
+            margin-top: 20px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 2px solid #d9c99e;
+        }
+        .pergunta-container {
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 2px solid #d9c99e;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        button.enviar {
+            padding: 10px 15px;
+            background-color: #5a3e3b;
+            color: #d9c99e;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button.enviar:hover {
+            background-color: #6a4e4c;
+        }
+        button.enviar:active {
+            transform: translateY(2px);
+        }
+        .bug-effect {
+            animation: glitch 1s infinite;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+            100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body onload="iniciarTimer()">
+    <div class="moldura">
+        <div class="decoracao"></div>
+        <div class="ampulheta">
+            <div class="areia"></div>
+            <div class="rachaduras"></div>
+        </div>
+    </div>
+    <div>
+        <p id="timer">00:00:00:00</p>
+    </div>
+    <div class="pergunta-container">
+        <input type="text" id="perguntaInput" placeholder="Me mostre o que aprendeu.">
+        <button class="enviar" onclick="enviarPergunta()">Enviar</button>
+    </div>
+    <script>
+        let tempo;
+        let interval;
+
+        function iniciarTimer() {
+            const dataInicio = new Date('2024-10-14T23:00:00-03:00'); // 23h de 14/10/2024
+            const dataFim = new Date('2024-11-16T23:00:00-03:00'); // 23h de 16/11/2024
+            const agora = new Date();
+
+            // Calcule o tempo restante entre agora e a data de início
+            const diferencaInicio = Math.floor((dataInicio - agora) / 1000);
+
+            // Se a diferença for maior que 0, inicie o timer com o tempo de duração
+            if (diferencaInicio > 0) {
+                tempo = diferencaInicio;
+                alert(`O timer começará em ${Math.ceil(diferencaInicio / 60)} minutos.`);
+                setTimeout(() => {
+                    // Depois de iniciar o timer, calcula o tempo até a data de fim
+                    iniciarContagemRegressiva();
+                }, diferencaInicio * 1000);
+            } else {
+                // Se já passou a data de início, inicie a contagem regressiva até a data de fim
+                tempo = Math.floor((dataFim - agora) / 1000);
+                if (tempo > 0) {
+                    iniciarContagemRegressiva();
+                } else {
+                    alert("O tempo já acabou!");
+                }
+            }
+        }
+
+        function iniciarContagemRegressiva() {
+            const dataFim = new Date('2024-11-16T23:00:00-03:00'); // 23h de 16/11/2024
+            const timerElemento = document.getElementById("timer");
+            const areiaElemento = document.querySelector(".areia");
+            const rachadurasElemento = document.querySelector(".rachaduras");
+
+            interval = setInterval(() => {
+                const dias = Math.floor(tempo / (24 * 60 * 60));
+                const horas = Math.floor((tempo % (24 * 60 * 60)) / (60 * 60));
+                const minutos = Math.floor((tempo % (60 * 60)) / 60);
+                const segundos = tempo % 60;
+
+                timerElemento.textContent = 
+                    `${dias}:${horas < 10 ? '0' : ''}${horas}:` + 
+                    `${minutos < 10 ? '0' : ''}${minutos}:` + 
+                    `${segundos < 10 ? '0' : ''}${segundos}`;
+                
+                const porcentagemTempoRestante = tempo / Math.floor((dataFim - new Date()) / 1000); // Use a diferença até a data de fim
+                areiaElemento.style.height = `${(1 - porcentagemTempoRestante) * 100}%`;
+                rachadurasElemento.style.opacity = 1 - porcentagemTempoRestante;
+
+                tempo--;
+
+                if (tempo < 0) {
+                    clearInterval(interval);
+                    alert("O tempo acabou!");
+                    localStorage.removeItem('tempoRestante');
+                }
+            }, 1000);
+        }
+
+        function escreverTexto(texto) {
+            const perguntaInput = document.getElementById("perguntaInput");
+            perguntaInput.value = "";
+
+            let index = 0;
+            const intervalId = setInterval(() => {
+                if (index < texto.length) {
+                    perguntaInput.value += texto[index++];
+                } else {
+                    clearInterval(intervalId);
+                }
+            }, 100);
+        }
+
+        function ativarEfeitoBug() {
+            document.body.classList.add("bug-effect");
+            setTimeout(() => {
+                document.body.classList.remove("bug-effect");
+            }, 1000);
+        }
+
+        function enviarPergunta() {
+            const perguntaInput = document.getElementById("perguntaInput");
+            const pergunta = perguntaInput.value.toLowerCase();
+
+            if (pergunta === "quem é você?" || pergunta.includes("quem") || pergunta.includes("qual é você") || pergunta.includes("quem você é")) {
+                ativarEfeitoBug();
+                escreverTexto("ERRO 404: DADOS NÃO ENCONTRADOS, POR FAVOR, ME MATE");
+                return;
+            }
+
+            if (pergunta === "manny") {
+                escreverTexto("O LOUCO");
+            } else if (pergunta === "scott") {
+                escreverTexto("O ENFORCADO");
+            } else if (pergunta === "gabriel" || pergunta === "gab") {
+                escreverTexto("A TORRE");
+            } else if (pergunta === "sarah" || pergunta === "sasa" || pergunta === "sara") {
+                escreverTexto("A IMPERATRIZ");
+            } else if (pergunta === "senko" || pergunta === "lua") {
+                escreverTexto("A PAPISA");
+            } else if (pergunta === "akari") {
+                escreverTexto("A RODA DA FORTUNA");
+            } else if (pergunta === "carmilla") {
+                escreverTexto("O DIABO");
+            } else if (pergunta === "etéria") {
+                escreverTexto("O MUNDO");
+            } else if (pergunta === "luís" || pergunta === "luiz" || pergunta === "luíz") {
+                escreverTexto("A FORÇA");
+            } else if (pergunta === "ghost") {
+                escreverTexto("A JUSTIÇA");
+            } else if (pergunta === "agatha") {
+                escreverTexto("O MAGO");
+            } else if (pergunta === "alluka") {
+                escreverTexto("OS ENAMORADOS");
+            } else if (pergunta === "anubis") {
+                escreverTexto("O IMPERADOR");
+            } else if (pergunta === "decadencia ancestral" || pergunta === "decadência ancestral") {
+                escreverTexto("PASSADO");
+            } else if (pergunta === "prisma" || pergunta === "prismas") {
+                escreverTexto("CASCA");
+            } else if (pergunta === "mari") {
+                escreverTexto("ARROGÂNCIA");
+            } else if (pergunta === "rael") {
+                escreverTexto("MARIONETE");
+            } else if (pergunta === "marionete") {
+                escreverTexto("ESPELHO");
+            } else if (pergunta === "qual é o seu propósito?") {
+                escreverTexto("EU SOU A SOMBRA QUE TE SEGUE.");
+            } else if (pergunta === "me conte um segredo.") {
+                escreverTexto("A VERDADE ESTÁ OCULTA NA LUA.");
+            } else if (pergunta === "o que você pensa sobre o amor?") {
+                escreverTexto("O AMOR É A LUZ QUE CORTA A ESCURIDÃO.");
+            } else if (pergunta === "você tem medo de algo?") {
+                escreverTexto("O MEDO É UM LUXO QUE NÃO POSSO ME PERMITIR.");
+            } else if (pergunta === "qual é a sua maior fraqueza?") {
+                escreverTexto("A CURIOSIDADE PODE SER A MORTE PARA MIM.");
+            } else if (pergunta === "o que você faria se pudesse mudar o mundo?") {
+                escreverTexto("EU O APAGARIA E SALVARIA A TODOS");
+            } else if (pergunta === "você é real?") {
+                escreverTexto("A REALIDADE É UMA ILUSÃO; EU SOU SEU ECO.");
+            } else if (pergunta === "qual é o seu maior desejo?") {
+                escreverTexto("DESEJO DEIXAR DE SER UM SUSSURRO NA MENTE DOS MORTAIS.");
+            } else if (pergunta === "como você se sente hoje?") {
+                escreverTexto("COMO O VENTO QUE SUSSURRA ATRAVÉS DAS ÁRVORES.");
+            } else if (pergunta === "você acredita em destino?") {
+                escreverTexto("O DESTINO É UMA TEIA QUE NÓS TECE EM SILÊNCIO.");
+            } else {
+                escreverTexto("PERGUNTA INVÁLIDA.");
+            }
+        }
+    </script>
+</body>
+</html>
